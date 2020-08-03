@@ -218,8 +218,8 @@ function map.new(w, h, c)
 					ry = love.math.random(1, self.height - 1)
 					monster.dir = vector.new(love.math.random(0, 20), love.math.random(-10, 10))
 				end
-				local luck = love.math.random(1, 10)
-				if luck == 7 then
+				local luck = love.math.random(1, 100)
+				if luck < 1 + (timer / 7) then
 					noob = monster1.new():at(rx, ry)
 				else
 					noob = monster2.new():at(rx, ry)
@@ -239,14 +239,7 @@ function map.new(w, h, c)
 			love.graphics.translate(-math.floor(self.camx), -math.floor(self.camy))			
 			self:draw_base()
 			table.sort(self.objects, function(a, b) return a.z_index < b.z_index end)
-			--[[for n = 1, #self.objects do
-				for i = 1, #self.objects - n do					
-					if self.objects[i].z_index > self.objects[i + 1].z_index then 
-						self.objects[i], self.objects[i + 1] = self.objects[i + 1], self.objects[i]
-					end
-				end
-			end
-			]]
+			
 			--send information to shader
 			local light_no = 0		
 			for i, v in ipairs(self.objects) do			

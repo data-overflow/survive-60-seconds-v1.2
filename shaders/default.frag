@@ -46,7 +46,7 @@ void enlighten(inout vec4 pix, vec2 screen_coords){
 }
 
 void applyEffects(inout vec4 pix){
-	grayscale(pix, 0.1);	
+	grayscale(pix, 0.1 + time / 200.0);	
 }
 
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords){

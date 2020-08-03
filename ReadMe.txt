@@ -4,10 +4,10 @@ PERSPECTILT STUDIOS presents,
   / ___/ / / / ___/ | / / / | / / _ \   / __ \/ / / /  / ___/ _ \/ ___/ __ \/ __ \/ __  / ___/
  (__  ) /_/ / /   | |/ / /| |/ /  __/  / /_/ / /_/ /  (__  )  __/ /__/ /_/ / / / / /_/ (__  ) 
 /____/\__,_/_/    |___/_/ |___/\___/   \____/\____/  /____/\___/\___/\____/_/ /_/\__,_/____/  
-========================================================================================
-SURVIVE 60 SECONDS v1.1
+=============================================================================================
+SURVIVE 60 SECONDS v1.2
  -  A game by Kavirajar B. -
-========================================================================================
+=============================================================================================
 
 INSTRUCTIONS
 How long can you survive from monsters that hunt you at dark?
@@ -22,6 +22,7 @@ How long can you survive from monsters that hunt you at dark?
 
 MUSIC
 Horror Ambience from https://freesound.org/s/133100/
+Thunderstorm Ambience from https://www.premiumbeat.com/blog/free-ambient-background-tracks/
 
 MADE WITH LÖVE2D
 https://love2d.org/
@@ -30,9 +31,9 @@ FOLLOW US ON itch.io AT
 https://perspectilt.itch.io
 
 The game is part of GMTK Game Jam 2020 on the theme "Out Of Control"
-Made in less than 48 hours! Watch out for updates! 
-==========================================================================================
+Made in less than 48 hours! Watch out for more updates! 
+===============================================================================================
 
 HAPPY GAMING
 
-==========================================================================================
+===============================================================================================

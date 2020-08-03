@@ -16,7 +16,15 @@ light = {
 		local l = image.new(LIGHT) 		
 		l.start = love.timer.getTime()
 		l.group = 'light'
-		l.light = {x = function() return l.x - l.map.camx end, y = function() return l.y - l.map.camy end, color = function() if l.light.power() > 150 then myMap:delete(l) end return {1, 1, 1} end, power = function() return 60 * (love.timer.getTime() - l.start + 1)/8 end}
+		l.light = {x = function() return l.x - l.map.camx end, y = function() return l.y - l.map.camy end, 
+		color = function() 
+			if l.light.power() > 150 then 
+				linv = linv + 1 				
+				myMap:delete(l)		
+			end 
+			return {1, 1, 1} 
+		end, 
+		power = function() return 60 * (love.timer.getTime() - l.start + 1)/8 end}
 		return l
 	end
 }
@@ -24,13 +32,12 @@ light = {
 monster1 = { --following monster
 	new = function() 
 		local monster = sprite.new('monster')		
-		monster.speed = 80
+		monster.speed = love.math.random(50, 55 + timer / 2)
 		monster:add_animation('idle', {RMONSTER.walk1}) 
 		monster:add_animation('walk', {RMONSTER.walk2, RMONSTER.walk1}, 0.2, true)
 		monster:play('walk')		
 		monster.hitbox = {offx = 0, offy = monster.height / 2, width = monster.width, height = monster.height / 2}
-		monster.dir = vector.new()
-		--monster.light = {x = function() return monster.x - monster.map.camx end, y = function() return monster.y - monster.map.camy end, color = function() return {1, 0, 0} end, power = function() return 500 + timer end}		
+		monster.dir = vector.new()		
 		monster.update = function(self, delta)
 			self:update_anim()		
 			self.z_index = self.y + self.height			
@@ -45,7 +52,13 @@ monster1 = { --following monster
 			
 			local c, l = self:collided_group('light')
 			if c then
-				l.light.color = function() if l.light.power() > 150 then myMap:delete(l) end return {1, 1 / (love.timer.getTime() - l.start), 1 / (love.timer.getTime() - l.start)} end
+				l.light.color = function() 
+					if l.light.power() > 150 then
+						linv = linv + 1 
+						myMap:delete(l) 
+					end 
+					return {1, 0.2 / (love.timer.getTime() - l.start), 0.2 / (love.timer.getTime() - l.start)} 
+				end				
 				myMap:delete(self)
 				myMap:delete_bump()
 				myMap:add_bump()
@@ -65,7 +78,7 @@ monster1 = { --following monster
 monster2 = { --random monster
 	new = function() 
 		local monster = sprite.new('monster')
-		monster.speed = love.math.random(80, 200 + timer)
+		monster.speed = love.math.random(80, 180 + timer)
 		monster:add_animation('idle', {GMONSTER.walk1}) 
 		monster:add_animation('walk', {GMONSTER.walk2, GMONSTER.walk1}, 0.2, true)
 		monster:play('walk')
@@ -84,7 +97,13 @@ monster2 = { --random monster
 			
 			local c, l = self:collided_group('light')
 			if c then
-				l.light.color = function() if l.light.power() > 150 then myMap:delete(l) end return {1, 1 / (love.timer.getTime() - l.start), 1 / (love.timer.getTime() - l.start)} end
+				l.light.color = function() 
+					if l.light.power() > 150 then
+						linv = linv + 1 
+						myMap:delete(l) 
+					end 
+					return {1, 0.2 / (love.timer.getTime() - l.start), 0.2 / (love.timer.getTime() - l.start)} 
+				end				
 				myMap:delete(self)
 				myMap:delete_bump()
 				myMap:add_bump()

@@ -1,4 +1,4 @@
---SURVIVE 60 SECONDS v1.1
+--SURVIVE 60 SECONDS v1.2
 function love.load()
 	print('[INFO] STARTING GAME...')
 	love.graphics.setColor(0, 0, 0)
@@ -11,8 +11,11 @@ function love.load()
 	love.window.setIcon(ICON)
 	
 	music = love.audio.newSource('audio/horror.mp3', 'static')
+	rain = love.audio.newSource('audio/thunderstorm.mp3', 'stream')
+	rain:setLooping(true)
 	music:setLooping(true)
 	music:play()
+	rain:stop()
 	
 	-- Creating essential classes
 	InputMap = {
@@ -86,12 +89,19 @@ function love.load()
 		end
 		
 		if Input['A'] then 
-			self.plant = self.plant + 1			
+			if linv > 0 then
+				if velocity:mag() > 0.5 then
+					self.plant = self.plant + 0.5
+				else
+					self.plant = self.plant + 2
+				end
+			end
 			if self.plant > 100 then
 				local light = light.new():at(self.x, self.y)
 				table.insert(myMap.images_bg, light)
 				light.map = myMap				
 				self.plant = 0
+				linv = linv - 1
 			end		
 		else
 			self.plant = 0
@@ -131,7 +141,38 @@ function love.load()
 	BANNER = love.graphics.newImage('assets/banner.png')	
 	TITLE = love.graphics.newImage('assets/title.png')	
 	splash = image.new(BANNER)
-	splash.light = {x = function() return 0 end, y = function() return 0 end, color = function() return {1, 1, 1} end, power = function() return 10 - timer * 3 end}
+	splash.light = {x = function() return 0 end, y = function() return 0 end, color = function() return {1, 1, 1} end, power = function() return 8 - timer * 4 end}
+	
+	texture = love.graphics.newImage('assets/raintex.png')
+	texture:setWrap('repeat','repeat')
+
+	local vertices = {
+		{			
+			0, 0, 
+			0, 0,
+			255, 255, 255, 10
+		},
+		{			
+			texture:getWidth(), 0,
+			1, 0, 
+			255, 255, 255, 10
+		},
+		{			
+			texture:getWidth(), texture:getHeight(),
+			1, 1,
+			255, 255, 255, 10
+		},
+		{			
+			0, texture:getHeight(),
+			0, 1,
+			255, 255, 255, 10
+		},
+	}
+
+	mesh = love.graphics.newMesh(vertices, 'fan')
+	mesh:setTexture(texture)
+	intensemesh = love.graphics.newMesh(vertices, 'fan')
+	intensemesh:setTexture(texture)
 	
 	myShader = love.graphics.newShader(shader.getCode())
 	myMap = map.new()
@@ -143,14 +184,17 @@ function love.load()
 	Font = love.graphics.newFont("assets/Pixel.ttf", 12)
 	Text = love.graphics.newText(font, "Hello world")
 	Text2 = love.graphics.newText(font, "")
+	Text3 = love.graphics.newText(font, "")
 	Text:setFont(Font)
 	Text2:setFont(Font)
+	Text3:setFont(Font)
 	timer = 0
+	linv = 6
 	
-	local f = love.filesystem.newFile("note.txt")
+	local f = love.filesystem.newFile("saves.txt")
 	f:open("r")
 	highscore = f:read()
-	if type(highscore) == type('100') then
+	if type(highscore) == type('10') then
 		highscore = tonumber(highscore)
 	end
 	highscore = highscore or 0
@@ -163,44 +207,66 @@ function love.draw()
 	love.graphics.push()
 	love.graphics.setShader(myShader)
 	myMap:draw()
-	
-	love.graphics.pop()
-	love.graphics.setShader()		
+	if timer > 41 then
+		love.graphics.draw(mesh, 0, 0, 0, 640 / texture:getWidth(), 480 / texture:getHeight())
+	end
+	love.graphics.setColor(0, 0, 0)
+	love.graphics.rectangle("fill", -60, 0, 60, 480)
+	love.graphics.rectangle("fill", 640, 0, 60, 480)
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.setShader()
+	if gameover then
+		love.graphics.print('press C to retry', 0, 0)
+	end
+	love.graphics.pop()		
 	if not(gameover) then
 		Text:set(math.floor(timer))
 		if pause then 
 			Text:set('paused')
 		end
+		Text3:set(linv)
 	else
+		Text3:set('')
 		Text:set("GAME OVER")
 		highscore = highscore or 0
 		local score = math.floor(timer)
 		if score > highscore then
 			print('[INFO] Saving highscore...')
-			highscore = score
-			local f = love.filesystem.newFile("note.txt")
+			highscore = score			
+			local f = love.filesystem.newFile("saves.txt")
 			f:open("w")
 			f:write(highscore)
 			f:close()
 		end
 		Text2:set('YOUR SCORE '..score..'\nHIGH SCORE '..highscore)
-		
-		love.graphics.print('press c to retry')
 		love.graphics.draw(Text2, WINDOW_WIDTH/2 - Text2:getWidth()/2, WINDOW_HEIGHT - 100)
 	end
 	
 	if gamestate == 'game' then
-		love.graphics.draw(Text, WINDOW_WIDTH/2 - Text:getWidth()/2, 20)				
+		love.graphics.draw(Text, WINDOW_WIDTH/2 - Text:getWidth()/2, 20)
+		love.graphics.draw(Text3, math.floor(WINDOW_WIDTH / 2 - Text3:getWidth()/2), WINDOW_HEIGHT - 100)
 	elseif gamestate == 'banner' then
 		love.graphics.draw(Text2, math.floor(WINDOW_WIDTH/2 - Text2:getWidth()/2), WINDOW_HEIGHT/2 - Text2:getHeight()/2)
-	end
+	end	
 end
 
 function love.update(dt)	
 	Input:update()
 	if not pause then
 		timer = timer + dt
-		myMap:update(dt)		
+		myMap:update(dt)
+		if timer > 40 then
+			if not(rain:isPlaying()) then
+				rain:play()
+			end
+			local u, v
+			for i=1,4 do
+				u, v = mesh:getVertexAttribute(i, 2)
+				u, v = u-dt/5, v-dt
+				mesh:setVertexAttribute(i, 2, u, v)
+			end
+		end
+		
 	else
 		if gameover then
 			if Input['accept'] then
@@ -209,6 +275,7 @@ function love.update(dt)
 				pause = false
 				gameover = false
 				timer = 0
+				linv = 6
 			end
 		end
 	end
@@ -232,7 +299,6 @@ function love.update(dt)
 			end
 		end		
 	end
-	
 end
 
 function love.keyreleased(key)
@@ -241,6 +307,9 @@ function love.keyreleased(key)
 	end
 	if key == 'p' then		
 		pause = not(pause)
+	end
+	if key == 'f12' then		
+		love.graphics.captureScreenshot('screenshot.png')
 	end
 	if key == 'f4' or key == 'f11' then
 		love.window.setFullscreen(not(love.window.getFullscreen()))
@@ -271,4 +340,5 @@ function start_new()
 	testmap:design({player:at(testmap.width/2, testmap.height/2)})
 	myMap = testmap
 	myMap:add_bump()
+	rain:stop()
 end
