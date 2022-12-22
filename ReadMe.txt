@@ -9,10 +9,12 @@ SURVIVE 60 SECONDS v1.2
  -  A game by Kavirajar B. -
 =============================================================================================
 
+![a preview from the game](screenshots/1.gif)
+
 INSTRUCTIONS
 How long can you survive from monsters that hunt you at dark?
 +-------------------------------------------+
-| Use <arrow keys> to move		    |
+| Use <arrow keys> to move		              |
 | Tap <z> while moving for temporary dash   |
 | Hold <x> to plant lights                  |
 | Press <c> to retry when you lose          |
@@ -28,7 +30,7 @@ MADE WITH LÖVE2D
 https://love2d.org/
 
 FOLLOW US ON itch.io AT
-https://perspectilt.itch.io
+https://dataoverflow.itch.io
 
 The game is part of GMTK Game Jam 2020 on the theme "Out Of Control"
 Made in less than 48 hours! Watch out for more updates! 
